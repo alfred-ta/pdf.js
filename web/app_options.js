@@ -536,7 +536,7 @@ const defaultOptions = {
         ? "../src/pdf.worker.js"
         : PDFJSDev.test("MOZCENTRAL")
           ? "resource://pdf.js/build/pdf.worker.mjs"
-          : "../build/pdf.worker.mjs",
+          : "./pdf.worker.mjs",
     kind: OptionKind.WORKER,
   },
 };
@@ -554,7 +554,7 @@ if (typeof PDFJSDev === "undefined" || !PDFJSDev.test("MOZCENTRAL")) {
     value:
       typeof PDFJSDev === "undefined"
         ? "../build/dev-sandbox/pdf.sandbox.mjs"
-        : "../build/pdf.sandbox.mjs",
+        : "./pdf.sandbox.mjs",
     kind: OptionKind.VIEWER,
   };
   defaultOptions.enableFakeMLManager = {

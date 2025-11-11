@@ -787,12 +787,17 @@ const PDFViewerApplication = {
     if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
       const queryString = document.location.search.substring(1);
       const params = parseQueryString(queryString);
-      file = params.get("file") ?? AppOptions.get("defaultUrl");
-      try {
-        file = new URL(decodeURIComponent(file)).href;
-      } catch {
-        file = encodeURIComponent(file).replaceAll("%2F", "/");
-      }
+      const paramsSrc = params.get("src");
+      const paramsId = params.get("id");
+      const paramsPath = params.get("path");
+      file = `index.php?m=get&action=send&src=${paramsSrc}&path=${paramsPath}&id=${paramsId}`;
+      // file = `index.php?m=get&action=send&src=${paramsSrc}&id=${paramsId}`;
+      // // file = params.get("file") ?? AppOptions.get("defaultUrl");
+      // try {
+      //   file = new URL(decodeURIComponent(file)).href;
+      // } catch {
+      //   file = encodeURIComponent(file).replaceAll("%2F", "/");
+      // }
       validateFileURL(file);
     } else if (PDFJSDev.test("MOZCENTRAL")) {
       file = window.location.href;
