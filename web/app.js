@@ -2475,15 +2475,8 @@ async function onPageRendered({ pageNumber, isDetailView, error }) {
     this.toolbar?.updateLoadingIndicatorState(false);
   }
 
-  // Use the rendered page to set the corresponding thumbnail image.
-  if (!isDetailView && this.pdfSidebar?.visibleView === SidebarView.THUMBS) {
+  if (!isDetailView) {
     const pageView = this.pdfViewer.getPageView(/* index = */ pageNumber - 1);
-    const thumbnailView = this.pdfThumbnailViewer?.getThumbnail(
-      /* index = */ pageNumber - 1
-    );
-    if (pageView) {
-      thumbnailView?.setImage(pageView);
-    }
     const pdfPage = await pageView.pdfPage;
 
     const annotations = await pdfPage.getAnnotations();
@@ -2504,6 +2497,18 @@ async function onPageRendered({ pageNumber, isDetailView, error }) {
 
     // Re-render annotation layer
     pageView.annotationLayer.render({ annotations, viewport: pageView.viewport });
+
+  }
+
+  // Use the rendered page to set the corresponding thumbnail image.
+  if (!isDetailView && this.pdfSidebar?.visibleView === SidebarView.THUMBS) {
+    const pageView = this.pdfViewer.getPageView(/* index = */ pageNumber - 1);
+    const thumbnailView = this.pdfThumbnailViewer?.getThumbnail(
+      /* index = */ pageNumber - 1
+    );
+    if (pageView) {
+      thumbnailView?.setImage(pageView);
+    }
   }
 
   if (error) {
