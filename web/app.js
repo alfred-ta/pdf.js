@@ -2468,37 +2468,36 @@ function onPageRender({ pageNumber }) {
   }
 }
 
-async function onPageRendered({ pageNumber, isDetailView, error }) {
+function onPageRendered({ pageNumber, isDetailView, error }) {
   // If the page is still visible when it has finished rendering,
   // ensure that the page number input loading indicator is hidden.
   if (pageNumber === this.page) {
     this.toolbar?.updateLoadingIndicatorState(false);
   }
 
-  if (!isDetailView) {
-    const pageView = this.pdfViewer.getPageView(/* index = */ pageNumber - 1);
-    const pdfPage = await pageView.pdfPage;
+  const $pageDiv = $(`#viewer .page[data-page-number="${pageNumber}"]`);
 
-    const annotations = await pdfPage.getAnnotations();
+  if ($pageDiv.find('.pdf-watermark').length) return; // already added
 
-    // Create a fake "FreeText" annotation
-    const watermarkAnnotation = {
-      subtype: 'FreeText',
-      rect: [100, 100, 400, 200], // [x1, y1, x2, y2]
-      contents: 'CONFIDENTIAL',
-      color: [0.8, 0.8, 0.8], // RGB values
-      defaultAppearance: '/Helv 36 Tf 0.7 g',
-      rotation: 45, // pdf.js doesn't honor this by default, you can handle manually
-      flags: 4, // print flag
-    };
+  const queryString = document.location.search.substring(1);
+  const params = parseQueryString(queryString);
+  const watermarkLabel = params.get("mark") || "CONFIDENTIAL";
+  
+  const $watermark = $(`<div class="pdf-watermark">${watermarkLabel.toUpperCase()}</div>`).css({
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%) rotate(-30deg)',
+    fontSize: '72px',
+    color: 'rgba(180, 180, 180, 0.25)',
+    pointerEvents: 'none',
+    zIndex: 10,
+    fontWeight: 'bold',
+    userSelect: 'none'
+  });
 
-    // Inject the annotation into pdf.js rendering process
-    annotations.push(watermarkAnnotation);
+  $pageDiv.css('position', 'relative').append($watermark);
 
-    // Re-render annotation layer
-    pageView.annotationLayer.render({ annotations, viewport: pageView.viewport });
-
-  }
 
   // Use the rendered page to set the corresponding thumbnail image.
   if (!isDetailView && this.pdfSidebar?.visibleView === SidebarView.THUMBS) {
