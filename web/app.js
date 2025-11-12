@@ -2468,7 +2468,7 @@ function onPageRender({ pageNumber }) {
   }
 }
 
-function onPageRendered({ pageNumber, isDetailView, error }) {
+async function onPageRendered({ pageNumber, isDetailView, error }) {
   // If the page is still visible when it has finished rendering,
   // ensure that the page number input loading indicator is hidden.
   if (pageNumber === this.page) {
@@ -2484,6 +2484,26 @@ function onPageRendered({ pageNumber, isDetailView, error }) {
     if (pageView) {
       thumbnailView?.setImage(pageView);
     }
+    const pdfPage = await pageView.pdfPage;
+
+    const annotations = await pdfPage.getAnnotations();
+
+    // Create a fake "FreeText" annotation
+    const watermarkAnnotation = {
+      subtype: 'FreeText',
+      rect: [100, 100, 400, 200], // [x1, y1, x2, y2]
+      contents: 'CONFIDENTIAL',
+      color: [0.8, 0.8, 0.8], // RGB values
+      defaultAppearance: '/Helv 36 Tf 0.7 g',
+      rotation: 45, // pdf.js doesn't honor this by default, you can handle manually
+      flags: 4, // print flag
+    };
+
+    // Inject the annotation into pdf.js rendering process
+    annotations.push(watermarkAnnotation);
+
+    // Re-render annotation layer
+    pageView.annotationLayer.render({ annotations, viewport: pageView.viewport });
   }
 
   if (error) {
