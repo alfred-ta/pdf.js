@@ -2479,9 +2479,8 @@ function onPageRendered({ pageNumber, isDetailView, error }) {
 
   if ($pageDiv.find('.pdf-watermark').length) return; // already added
 
-  const queryString = document.location.search.substring(1);
-  const params = parseQueryString(queryString);
-  const watermarkLabel = params.get("mark") || "CONFIDENTIAL";
+  const watermarkLabel = $("#watermarkLabel").val().trim();
+  if (!watermarkLabel || watermarkLabel.length < 1 || watermarkLabel === "###LABEL###") return;
   
   const $watermark = $(`<div class="pdf-watermark">${watermarkLabel.toUpperCase()}</div>`).css({
     position: 'absolute',
